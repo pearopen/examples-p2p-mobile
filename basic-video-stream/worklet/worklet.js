@@ -16,17 +16,16 @@ export default class Worklet extends ReadyResource {
     this.store = new Corestore(storage)
     this.swarm = new Hyperswarm()
     this.swarm.on('connection', (conn) => this.store.replicate(conn))
-    this.room = null
-  }
-
-  async _open () {
-    await this.store.ready()
 
     this.room = new VideoStreamRoom(this.store, this.swarm)
     this.room.on('update', async () => {
       await this._getMessages()
       await this._getVideos()
     })
+  }
+
+  async _open () {
+    await this.store.ready()
 
     const lineDecoder = new NewlineDecoder()
     this.pipe.on('data', async (data) => {
@@ -57,10 +56,10 @@ export default class Worklet extends ReadyResource {
     }
   }
 
-  _close () {
-    this.room?.close()
-    this.swarm.destroy()
-    this.store.close()
+  async _close () {
+    await this.room.close()
+    await this.swarm.destroy()
+    await this.store.close()
   }
 
   async _start () {

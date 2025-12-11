@@ -84,7 +84,7 @@ export default function App () {
     </>
   )
 
-  const renderStudioRoom = () => (
+  const renderVideos = () => (
     <>
       <Text>Invite: {invite}</Text>
       <View style={styles.inviteActionRow}>
@@ -150,6 +150,7 @@ export default function App () {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View style={styles.container}>
+        {!invite ? renderSetupRoom() : renderVideos()}
         {error && (
           <>
             <Text style={styles.title}>{error}</Text>
@@ -158,7 +159,6 @@ export default function App () {
             </TouchableOpacity>
           </>
         )}
-        {invite ? renderStudioRoom() : renderSetupRoom()}
       </View>
     </TouchableWithoutFeedback>
   )
