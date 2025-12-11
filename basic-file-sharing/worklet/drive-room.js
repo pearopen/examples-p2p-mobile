@@ -73,11 +73,10 @@ export default class DriveRoom extends ReadyResource {
       apply: this._applyBase.bind(this)
     })
 
-    const downloadSharedDrives = debounce(() => this._downloadSharedDrives())
     const writablePromise = new Promise((resolve) => {
       this.base.on('update', () => {
         if (this.base.writable) resolve()
-        if (!this.base._interrupting) downloadSharedDrives()
+        if (!this.base._interrupting) this.emit('update')
       })
     })
     await this.base.ready()
@@ -103,6 +102,8 @@ export default class DriveRoom extends ReadyResource {
       }
     })
 
+    const downloadSharedDrives = debounce(() => this._downloadSharedDrives())
+    this.on('update', () => downloadSharedDrives())
     await downloadSharedDrives()
     await this._uploadMyDrive()
   }
