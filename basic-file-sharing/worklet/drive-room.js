@@ -143,15 +143,6 @@ export default class DriveRoom extends ReadyResource {
     })
   }
 
-  async _uploadMyDrive () {
-    await this.myDrive.ready()
-    this.addDrive(this.myDrive.key, { name: this.name })
-    this.swarm.join(this.myDrive.discoveryKey)
-
-    const mirror = debounce(() => this.myLocalDrive.mirror(this.myDrive).done())
-    this.uploadInterval = setInterval(() => mirror(), 1000 * 5)
-  }
-
   async _downloadSharedDrives () {
     const drives = await this.getDrives()
     await Promise.all(drives.map(async (item) => {
@@ -169,6 +160,15 @@ export default class DriveRoom extends ReadyResource {
       await drive.ready()
       this.swarm.join(drive.discoveryKey)
     }))
+  }
+
+  async _uploadMyDrive () {
+    await this.myDrive.ready()
+    this.addDrive(this.myDrive.key, { name: this.name })
+    this.swarm.join(this.myDrive.discoveryKey)
+
+    const mirror = debounce(() => this.myLocalDrive.mirror(this.myDrive).done())
+    this.uploadInterval = setInterval(() => mirror(), 1000 * 5)
   }
 
   /** @type {HyperDB} */
