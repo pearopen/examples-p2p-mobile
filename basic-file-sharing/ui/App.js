@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { StyleSheet, Text, View, TextInput, Button, ScrollView, TouchableOpacity, TouchableWithoutFeedback, Keyboard, Linking } from 'react-native'
 import { setStringAsync } from 'expo-clipboard'
 import { getDocumentAsync } from 'expo-document-picker'
-import { isAvailableAsync, shareAsync } from 'expo-sharing'
+import { shareAsync } from 'expo-sharing'
 
 import useWorklet from './use-workket'
 
