@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "offset": 0,
+  "schema": [
+    {
+      "name": "invites",
+      "namespace": "basic-file-sharing",
+      "id": 0,
+      "type": 1,
+      "version": 1,
+      "versionField": null,
+      "indexes": [],
+      "schema": "@basic-file-sharing/invites",
+      "derived": false,
+      "key": [
+        "id"
+      ],
+      "trigger": null
+    },
+    {
+      "name": "drives",
+      "namespace": "basic-file-sharing",
+      "id": 1,
+      "type": 1,
+      "version": 1,
+      "versionField": null,
+      "indexes": [],
+      "schema": "@basic-file-sharing/drives",
+      "derived": false,
+      "key": [
+        "key"
+      ],
+      "trigger": null
+    }
+  ]
+}
