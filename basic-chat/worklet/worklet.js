@@ -45,7 +45,7 @@ export default class Worklet extends ReadyResource {
     })
 
     await this.room.localBase.ready()
-    if (this.localBase.length === 0) {
+    if (this.room.localBase.length === 0) {
       this._write('invite', '')
     } else {
       await this._start()
