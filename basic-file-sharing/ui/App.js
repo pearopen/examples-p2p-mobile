@@ -32,23 +32,14 @@ export default function App () {
   }
 
   const onAddFile = async () => {
-    try {
-      const result = await getDocumentAsync()
-      for (const asset of result.assets) {
-        addFile({ name: asset.name, uri: asset.uri.substring('file://'.length) })
-      }
-    } catch (err) {
-      console.log(err)
-      alert('Failed to pick a file')
+    const result = await getDocumentAsync()
+    for (const asset of result.assets) {
+      addFile({ name: asset.name, uri: asset.uri.substring('file://'.length) })
     }
   }
 
   const onOpenFile = async (url) => {
-    if (await isAvailableAsync()) {
-      await shareAsync(url)
-    } else {
-      await Linking.openURL(url)
-    }
+    await shareAsync(url)
   }
 
   const renderSetupRoom = () => (
