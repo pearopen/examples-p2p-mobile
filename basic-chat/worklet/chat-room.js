@@ -5,8 +5,8 @@ import HyperDB from 'hyperdb'
 import ReadyResource from 'ready-resource'
 import z32 from 'z32'
 
-import * as BasicChatDispatch from '../spec/dispatch'
-import BasicChatDb from '../spec/db'
+import * as ChatDispatch from '../spec/dispatch'
+import ChatDb from '../spec/db'
 
 export default class ChatRoom extends ReadyResource {
   constructor (store, swarm) {
@@ -18,27 +18,28 @@ export default class ChatRoom extends ReadyResource {
     this.pairing = new BlindPairing(swarm)
 
     /** @type {{ add: function(string, function(any, { view: HyperDB, base: Autobase })) }} */
-    this.router = new BasicChatDispatch.Router()
+    this.router = new ChatDispatch.Router()
     this._setupRouter()
 
-    this.localBase = null
-    this.localKey = null
-
-    this.invite = null
-
+    this.localBase = Autobase.getLocalCore(this.store)
     this.base = null
     this.pairMember = null
+
+    this.invite = null
   }
 
   async _open () {
-    const isEmpty = await this.isEmptyBase()
+    await this.localBase.ready()
+    const localKey = this.localBase.key
+    const isEmpty = this.localBase.length === 0
+
     let key
     let encryptionKey
     if (isEmpty && this.invite) {
       const res = await new Promise((resolve) => {
         this.pairing.addCandidate({
           invite: z32.decode(this.invite),
-          userData: this.localKey,
+          userData: localKey,
           onadd: resolve
         })
       })
@@ -48,6 +49,7 @@ export default class ChatRoom extends ReadyResource {
 
     // if base is not initialized, key and encryptionKey must be provided
     // if base is already initialized in this store namespace, key and encryptionKey can be omitted
+    await this.localBase.close()
     this.base = new Autobase(this.store, key, {
       encrypt: true,
       encryptionKey,
@@ -88,13 +90,13 @@ export default class ChatRoom extends ReadyResource {
 
   async _close () {
     await this.pairMember?.close()
-    await this.localBase?.close()
     await this.base?.close()
+    await this.localBase.close()
     await this.pairing.close()
   }
 
   _openBase (store) {
-    return HyperDB.bee(store.get('view'), BasicChatDb, { extension: false, autoUpdate: true })
+    return HyperDB.bee(store.get('view'), ChatDb, { extension: false, autoUpdate: true })
   }
 
   async _closeBase (view) {
@@ -125,16 +127,6 @@ export default class ChatRoom extends ReadyResource {
     return this.base.view
   }
 
-  async isEmptyBase () {
-    const baseLocal = Autobase.getLocalCore(this.store)
-    this.localBase = baseLocal
-    await baseLocal.ready()
-    this.localKey = baseLocal.key
-    const isEmpty = baseLocal.length === 0
-    await baseLocal.close()
-    return isEmpty
-  }
-
   async getInvite () {
     const existing = await this.view.findOne('@basic-chat/invites', {})
     if (existing) {
@@ -143,14 +135,14 @@ export default class ChatRoom extends ReadyResource {
     const { id, invite, publicKey, expires } = BlindPairing.createInvite(this.base.key)
     const record = { id, invite, publicKey, expires }
     await this.base.append(
-      BasicChatDispatch.encode('@basic-chat/add-invite', record)
+      ChatDispatch.encode('@basic-chat/add-invite', record)
     )
     return z32.encode(record.invite)
   }
 
   async addWriter (key) {
     await this.base.append(
-      BasicChatDispatch.encode('@basic-chat/add-writer', { key: b4a.isBuffer(key) ? key : b4a.from(key) })
+      ChatDispatch.encode('@basic-chat/add-writer', { key: b4a.isBuffer(key) ? key : b4a.from(key) })
     )
   }
 
@@ -161,7 +153,7 @@ export default class ChatRoom extends ReadyResource {
   async addMessage (text, info) {
     const id = Math.random().toString(16).slice(2)
     await this.base.append(
-      BasicChatDispatch.encode('@basic-chat/add-message', { id, text, info })
+      ChatDispatch.encode('@basic-chat/add-message', { id, text, info })
     )
   }
 }
