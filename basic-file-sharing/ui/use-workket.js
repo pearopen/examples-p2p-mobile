@@ -48,6 +48,7 @@ export default function useWorklet () {
     files,
     error,
     start: (invite) => write('start', invite),
+    addFile: (file) => write('add-file', file),
     reset: () => {
       write('reset')
       setFiles([])

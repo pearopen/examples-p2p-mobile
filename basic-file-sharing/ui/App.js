@@ -2,12 +2,13 @@
 import { useState } from 'react'
 import { StyleSheet, Text, View, TextInput, Button, ScrollView, TouchableOpacity, TouchableWithoutFeedback, Keyboard, Linking } from 'react-native'
 import { setStringAsync } from 'expo-clipboard'
-import * as Sharing from 'expo-sharing'
+import { getDocumentAsync } from 'expo-document-picker'
+import { isAvailableAsync, shareAsync } from 'expo-sharing'
 
 import useWorklet from './use-workket'
 
 export default function App () {
-  const { invite, files, error, start, reset, clearError } = useWorklet()
+  const { invite, files, error, start, addFile, reset, clearError } = useWorklet()
 
   const [mode, setMode] = useState('create')
   const [joinInvite, setJoinInvite] = useState('')
@@ -30,9 +31,21 @@ export default function App () {
     reset()
   }
 
-  const onOpen = async (url) => {
-    if (await Sharing.isAvailableAsync()) {
-      await Sharing.shareAsync(url)
+  const onAddFile = async () => {
+    try {
+      const result = await getDocumentAsync()
+      for (const asset of result.assets) {
+        addFile({ name: asset.name, uri: asset.uri.substring('file://'.length) })
+      }
+    } catch (err) {
+      console.log(err)
+      alert('Failed to pick a file')
+    }
+  }
+
+  const onOpenFile = async (url) => {
+    if (await isAvailableAsync()) {
+      await shareAsync(url)
     } else {
       await Linking.openURL(url)
     }
@@ -85,6 +98,9 @@ export default function App () {
         </TouchableOpacity>
       </View>
       <Text style={styles.title}>Drives</Text>
+      <TouchableOpacity style={styles.addFileButton} onPress={onAddFile}>
+        <Text style={styles.addFileText}>Add File</Text>
+      </TouchableOpacity>
       <ScrollView style={styles.files}>
         {files.map((item) => (
           <View key={item.name} style={styles.driveRow}>
@@ -95,7 +111,7 @@ export default function App () {
                   <Text>- </Text>
                   <Text
                     style={styles.underlineText}
-                    onPress={() => onOpen(file.url)}
+                    onPress={() => onOpenFile(file.url)}
                   >
                     {file.name}
                   </Text>
@@ -198,6 +214,16 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 12
+  },
+  addFileButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    backgroundColor: '#34C759',
+    marginLeft: 8
+  },
+  addFileText: {
+    color: '#fff',
+    fontWeight: 'bold'
   },
   files: {
     flex: 1,

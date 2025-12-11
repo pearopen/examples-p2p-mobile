@@ -53,6 +53,8 @@ export default class Worklet extends ReadyResource {
           } else if (obj.tag === 'start') {
             this.room.invite = obj.data
             await this._start()
+          } else if (obj.tag === 'add-file') {
+            await fs.promises.copyFile(obj.data.uri, path.join(this.myDrivePath, obj.data.name))
           }
         } catch (err) {
           this._write('error', `${line} ~ ${err}`)
@@ -81,7 +83,7 @@ export default class Worklet extends ReadyResource {
 
     this.intervalFiles = setInterval(async () => {
       const myDriveFiles = {
-        name: 'My drive (add files here)',
+        name: 'My drive',
         dir: `file://${this.myDrivePath}`,
         files: (await fs.promises.readdir(this.myDrivePath)).map((name) => ({
           name,
