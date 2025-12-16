@@ -10,7 +10,7 @@
       "version": 1,
       "versionField": null,
       "indexes": [],
-      "schema": "@basic-file-sharing/invites",
+      "schema": "@basic-file-sharing/invite",
       "derived": false,
       "key": [
         "id"
@@ -25,7 +25,7 @@
       "version": 1,
       "versionField": null,
       "indexes": [],
-      "schema": "@basic-file-sharing/drives",
+      "schema": "@basic-file-sharing/drive",
       "derived": false,
       "key": [
         "key"

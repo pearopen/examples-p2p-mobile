@@ -2,7 +2,7 @@
 
 - P2P basic file sharing app running in mobile environment
 
-- Stack: holepunch, bare, bare-kit, react-native-bare-kit, autobase, hyperdb, blind-pairing, hyperswarm, corestore, hyperdrive, localdrive
+- Stack: holepunch, bare, bare-kit, react-native-bare-kit, corestore, hyperswarm, blind-pairing, hyperdb, hrpc, autobase, hyperdrive, localdrive
 
 ## Usage
 

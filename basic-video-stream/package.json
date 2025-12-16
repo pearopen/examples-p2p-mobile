@@ -36,7 +36,6 @@
     "hyperdispatch": "^1.4.4",
     "hyperschema": "^1.17.1",
     "hyperswarm": "^4.16.0",
-    "newline-decoder": "^1.0.2",
     "react": "19.1.0",
     "react-native": "~0.81.5",
     "react-native-b4a": "^0.0.4",

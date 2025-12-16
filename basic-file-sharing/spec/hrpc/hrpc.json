@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "schema": [
+    {
+      "id": 0,
+      "name": "@basic-file-sharing/log",
+      "request": {
+        "name": "@basic-file-sharing/log",
+        "send": true
+      },
+      "version": 1
+    },
+    {
+      "id": 1,
+      "name": "@basic-file-sharing/reset",
+      "request": {
+        "name": "bool",
+        "send": true
+      },
+      "version": 1
+    },
+    {
+      "id": 2,
+      "name": "@basic-file-sharing/start",
+      "request": {
+        "name": "string",
+        "send": true
+      },
+      "version": 1
+    },
+    {
+      "id": 3,
+      "name": "@basic-file-sharing/drives",
+      "request": {
+        "name": "@basic-file-sharing/drives",
+        "send": true
+      },
+      "version": 1
+    },
+    {
+      "id": 4,
+      "name": "@basic-file-sharing/add-file",
+      "request": {
+        "name": "@basic-file-sharing/file",
+        "send": true
+      },
+      "version": 1
+    }
+  ]
+}

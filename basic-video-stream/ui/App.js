@@ -34,13 +34,9 @@ export default function App () {
   }
 
   const onAddFile = async () => {
-    try {
-      const result = await getDocumentAsync({ type: 'video/*' })
-      for (const asset of result.assets) {
-        addVideo({ name: asset.name, uri: asset.uri.substring('file://'.length) })
-      }
-    } catch (err) {
-      alert('Failed to pick a file')
+    const result = await getDocumentAsync({ type: 'video/*' })
+    for (const asset of result.assets) {
+      addVideo({ name: asset.name, uri: asset.uri.substring('file://'.length) })
     }
   }
 

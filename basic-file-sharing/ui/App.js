@@ -8,7 +8,7 @@ import { shareAsync } from 'expo-sharing'
 import useWorklet from './use-workket'
 
 export default function App () {
-  const { invite, files, error, start, addFile, reset, clearError } = useWorklet()
+  const { error, invite, drives, clearError, reset, start, addFile } = useWorklet()
 
   const [mode, setMode] = useState('create')
   const [joinInvite, setJoinInvite] = useState('')
@@ -24,7 +24,7 @@ export default function App () {
       alert('Please provide invite to join room')
       return
     }
-    start(mode === 'join' ? joinInvite : undefined)
+    start(mode === 'join' ? joinInvite : '')
   }
 
   const onReset = () => {
@@ -77,7 +77,7 @@ export default function App () {
     </>
   )
 
-  const renderFiles = () => (
+  const renderDrives = () => (
     <>
       <Text>Invite: {invite}</Text>
       <View style={styles.inviteActionRow}>
@@ -93,16 +93,16 @@ export default function App () {
         <Text style={styles.addFileText}>Add File</Text>
       </TouchableOpacity>
       <ScrollView style={styles.files}>
-        {files.map((item) => (
-          <View key={item.name} style={styles.driveRow}>
-            <Text>{item.name}</Text>
+        {drives.map((drive, idx) => (
+          <View key={idx} style={styles.driveRow}>
+            <Text>{drive.info.name} {drive.info.isMyDrive && '(My drive)'}</Text>
             <View>
-              {item.files.map((file, idx) => (
+              {drive.info.files.map((file, idx) => (
                 <View key={idx} style={styles.fileRow}>
                   <Text>- </Text>
                   <Text
                     style={styles.underlineText}
-                    onPress={() => onOpenFile(file.url)}
+                    onPress={() => onOpenFile(file.uri)}
                   >
                     {file.name}
                   </Text>
@@ -118,7 +118,6 @@ export default function App () {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View style={styles.container}>
-        {!invite ? renderSetupRoom() : renderFiles()}
         {error && (
           <>
             <Text style={styles.title}>{error}</Text>
@@ -127,6 +126,7 @@ export default function App () {
             </TouchableOpacity>
           </>
         )}
+        {!invite ? renderSetupRoom() : renderDrives()}
       </View>
     </TouchableWithoutFeedback>
   )
@@ -195,7 +195,8 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 12,
     backgroundColor: 'red',
-    marginLeft: 8
+    marginTop: 12,
+    marginBottom: 12
   },
   resetText: {
     color: '#fff',
@@ -216,7 +217,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold'
   },
-  files: {
+  drives: {
     flex: 1,
     alignSelf: 'stretch',
     marginBottom: 16
