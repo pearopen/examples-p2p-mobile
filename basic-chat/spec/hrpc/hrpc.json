@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "schema": [
+    {
+      "id": 0,
+      "name": "@basic-chat/log",
+      "request": {
+        "name": "@basic-chat/log",
+        "send": true
+      },
+      "version": 1
+    },
+    {
+      "id": 1,
+      "name": "@basic-chat/reset",
+      "request": {
+        "name": "bool",
+        "send": true
+      },
+      "version": 1
+    },
+    {
+      "id": 2,
+      "name": "@basic-chat/start",
+      "request": {
+        "name": "string",
+        "send": true
+      },
+      "version": 1
+    },
+    {
+      "id": 3,
+      "name": "@basic-chat/messages",
+      "request": {
+        "name": "@basic-chat/messages",
+        "send": true
+      },
+      "version": 1
+    },
+    {
+      "id": 4,
+      "name": "@basic-chat/add-message",
+      "request": {
+        "name": "string",
+        "send": true
+      },
+      "version": 1
+    }
+  ]
+}

@@ -2,7 +2,7 @@
 
 - P2P basic chat app running in mobile environment
 
-- Stack: holepunch, bare, bare-kit, react-native-bare-kit, autobase, hyperdb, blind-pairing, hyperswarm, corestore
+- Stack: holepunch, bare, bare-kit, react-native-bare-kit, corestore, hyperswarm, blind-pairing, hyperdb, hrpc, autobase
 
 ## Usage
 

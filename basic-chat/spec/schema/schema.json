@@ -2,7 +2,33 @@
   "version": 1,
   "schema": [
     {
-      "name": "writers",
+      "name": "log",
+      "namespace": "basic-chat",
+      "compact": false,
+      "flagsPosition": -1,
+      "fields": [
+        {
+          "name": "level",
+          "required": true,
+          "type": "string",
+          "version": 1
+        },
+        {
+          "name": "message",
+          "required": true,
+          "type": "string",
+          "version": 1
+        },
+        {
+          "name": "at",
+          "required": true,
+          "type": "int",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "name": "writer",
       "namespace": "basic-chat",
       "compact": false,
       "flagsPosition": -1,
@@ -16,7 +42,7 @@
       ]
     },
     {
-      "name": "invites",
+      "name": "invite",
       "namespace": "basic-chat",
       "compact": false,
       "flagsPosition": -1,
@@ -48,7 +74,7 @@
       ]
     },
     {
-      "name": "messages",
+      "name": "message",
       "namespace": "basic-chat",
       "compact": false,
       "flagsPosition": 2,
@@ -71,6 +97,12 @@
           "version": 1
         }
       ]
+    },
+    {
+      "name": "messages",
+      "namespace": "basic-chat",
+      "array": true,
+      "type": "@basic-chat/message"
     }
   ]
 }

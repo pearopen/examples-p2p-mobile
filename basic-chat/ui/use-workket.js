@@ -1,10 +1,10 @@
-import b4a from 'b4a'
 import { Paths } from 'expo-file-system'
-import NewlineDecoder from 'newline-decoder'
+import FramedStream from 'framed-stream'
 import { useState, useEffect } from 'react'
 import { Worklet } from 'react-native-bare-kit'
 
 import bundle from '../worklet/app.bundle.mjs'
+import HRPC from '../spec/hrpc'
 
 const documentDir = Paths.document.uri.substring('file://'.length)
 const storage = Paths.join(documentDir, 'basic-chat')
@@ -13,50 +13,38 @@ const worklet = new Worklet()
 worklet.start('/app.bundle', bundle, [storage])
 const { IPC: pipe } = worklet
 
+const stream = new FramedStream(pipe)
+const rpc = new HRPC(stream)
+stream.pause()
+
 export default function useWorklet () {
+  const [error, setError] = useState('')
   const [invite, setInvite] = useState()
   const [messages, setMessages] = useState([])
-  const [error, setError] = useState('')
 
   useEffect(() => {
-    const lineDecoder = new NewlineDecoder()
-    pipe.on('data', (data) => {
-      const str = b4a.toString(data)
-      for (const line of lineDecoder.push(str)) {
-        try {
-          const obj = JSON.parse(line)
-          if (obj.tag === 'invite') {
-            setInvite(obj.data)
-          } else if (obj.tag === 'messages') {
-            setMessages(obj.data)
-          } else if (obj.tag === 'error') {
-            console.log(obj.data)
-            setError(obj.data)
-          } else if (obj.tag === 'log') {
-            console.log(obj.data)
-          }
-        } catch (err) {
-          write('error', `${line} ~ ${err}`)
-        }
+    rpc.onLog((data) => {
+      console[data.level || 'log'](new Date(data.at).toISOString(), data.message)
+      if (data.level === 'error') {
+        setError(data.message)
       }
     })
+    rpc.onStart((data) => setInvite(data))
+    rpc.onMessages((data) => setMessages(data))
+    stream.resume()
     return () => pipe.end()
   }, [])
 
   return {
+    error,
     invite,
     messages,
-    error,
-    start: (invite) => write('start', invite),
-    addMessage: (message) => write('add-message', message),
+    clearError: () => setError(''),
     reset: () => {
-      write('reset')
+      rpc.reset()
       setMessages([])
     },
-    clearError: () => setError('')
+    start: (invite) => rpc.start(invite),
+    addMessage: (message) => rpc.addMessage(message)
   }
-}
-
-function write (tag, data) {
-  pipe.write(b4a.from(JSON.stringify({ tag, data }) + '\n'))
 }

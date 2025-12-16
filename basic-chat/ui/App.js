@@ -6,7 +6,7 @@ import { setStringAsync } from 'expo-clipboard'
 import useWorklet from './use-workket'
 
 export default function App () {
-  const { invite, messages, error, start, addMessage, reset, clearError } = useWorklet()
+  const { error, invite, messages, clearError, reset, start, addMessage } = useWorklet()
 
   const [mode, setMode] = useState('create')
   const [joinInvite, setJoinInvite] = useState('')
@@ -23,7 +23,7 @@ export default function App () {
       alert('Please provide invite to join room')
       return
     }
-    start(mode === 'join' ? joinInvite : undefined)
+    start(mode === 'join' ? joinInvite : '')
   }
 
   const onSend = () => {
@@ -102,7 +102,6 @@ export default function App () {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View style={styles.container}>
-        {!invite ? renderSetupRoom() : renderChatRoom()}
         {error && (
           <>
             <Text style={styles.title}>{error}</Text>
@@ -111,6 +110,7 @@ export default function App () {
             </TouchableOpacity>
           </>
         )}
+        {!invite ? renderSetupRoom() : renderChatRoom()}
       </View>
     </TouchableWithoutFeedback>
   )
@@ -179,7 +179,8 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 12,
     backgroundColor: 'red',
-    marginLeft: 8
+    marginTop: 12,
+    marginBottom: 12
   },
   resetText: {
     color: '#fff',

@@ -11,8 +11,33 @@ const VERSION = 1
 // eslint-disable-next-line no-unused-vars
 let version = VERSION
 
-// @basic-chat/writers
+// @basic-chat/log
 const encoding0 = {
+  preencode(state, m) {
+    c.string.preencode(state, m.level)
+    c.string.preencode(state, m.message)
+    c.int.preencode(state, m.at)
+  },
+  encode(state, m) {
+    c.string.encode(state, m.level)
+    c.string.encode(state, m.message)
+    c.int.encode(state, m.at)
+  },
+  decode(state) {
+    const r0 = c.string.decode(state)
+    const r1 = c.string.decode(state)
+    const r2 = c.int.decode(state)
+
+    return {
+      level: r0,
+      message: r1,
+      at: r2
+    }
+  }
+}
+
+// @basic-chat/writer
+const encoding1 = {
   preencode(state, m) {
     c.buffer.preencode(state, m.key)
   },
@@ -28,8 +53,8 @@ const encoding0 = {
   }
 }
 
-// @basic-chat/invites
-const encoding1 = {
+// @basic-chat/invite
+const encoding2 = {
   preencode(state, m) {
     c.buffer.preencode(state, m.id)
     c.buffer.preencode(state, m.invite)
@@ -57,8 +82,8 @@ const encoding1 = {
   }
 }
 
-// @basic-chat/messages
-const encoding2 = {
+// @basic-chat/message
+const encoding3 = {
   preencode(state, m) {
     c.string.preencode(state, m.id)
     c.string.preencode(state, m.text)
@@ -88,6 +113,9 @@ const encoding2 = {
   }
 }
 
+// @basic-chat/messages
+const encoding4 = c.array(c.frame(encoding3))
+
 function setVersion(v) {
   version = v
 }
@@ -111,12 +139,16 @@ function getEnum(name) {
 
 function getEncoding(name) {
   switch (name) {
-    case '@basic-chat/writers':
+    case '@basic-chat/log':
       return encoding0
-    case '@basic-chat/invites':
+    case '@basic-chat/writer':
       return encoding1
-    case '@basic-chat/messages':
+    case '@basic-chat/invite':
       return encoding2
+    case '@basic-chat/message':
+      return encoding3
+    case '@basic-chat/messages':
+      return encoding4
     default:
       throw new Error('Encoder not found ' + name)
   }

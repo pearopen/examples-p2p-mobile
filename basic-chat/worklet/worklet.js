@@ -1,15 +1,21 @@
 import Corestore from 'corestore'
+import debounce from 'debounceify'
 import Hyperswarm from 'hyperswarm'
-import NewlineDecoder from 'newline-decoder'
+import FramedStream from 'framed-stream'
 import ReadyResource from 'ready-resource'
 
 import ChatRoom from './chat-room'
+import HRPC from '../spec/hrpc'
 
 export default class Worklet extends ReadyResource {
   constructor (pipe, storage, name) {
     super()
 
     this.pipe = pipe
+    this.stream = new FramedStream(pipe)
+    this.rpc = new HRPC(this.stream)
+    this.stream.pause()
+
     this.storage = storage
     this.name = name || `User ${Date.now()}`
 
@@ -18,35 +24,26 @@ export default class Worklet extends ReadyResource {
     this.swarm.on('connection', (conn) => this.store.replicate(conn))
 
     this.room = new ChatRoom(this.store, this.swarm)
-    this.room.on('update', () => this._getMessages())
+    this.debounceMessages = debounce(() => this._messages())
+    this.room.on('update', () => this.debounceMessages())
   }
 
   async _open () {
     await this.store.ready()
 
-    const lineDecoder = new NewlineDecoder()
-    this.pipe.on('data', async (data) => {
-      const str = data.toString()
-      for (const line of lineDecoder.push(str)) {
-        try {
-          const obj = JSON.parse(line)
-          if (obj.tag === 'reset') {
-            this.emit('reset')
-          } else if (obj.tag === 'start') {
-            this.room.invite = obj.data
-            await this._start()
-          } else if (obj.tag === 'add-message') {
-            await this.room.addMessage(obj.data, { name: this.name, at: Date.now() })
-          }
-        } catch (err) {
-          this._write('error', `${line} ~ ${err}`)
-        }
-      }
+    this.rpc.onReset(() => this.emit('reset'))
+    this.rpc.onStart(async (data) => {
+      this.room.invite = data
+      await this._start()
     })
+    this.rpc.onAddMessage(async (data) => {
+      await this.room.addMessage(data, { name: this.name, at: Date.now() })
+    })
+    this.stream.resume()
 
     await this.room.localBase.ready()
     if (this.room.localBase.length === 0) {
-      this._write('invite', '')
+      this.rpc.start('')
     } else {
       await this._start()
     }
@@ -60,17 +57,13 @@ export default class Worklet extends ReadyResource {
 
   async _start () {
     await this.room.ready()
-    this._write('invite', await this.room.getInvite())
-    await this._getMessages()
+    this.rpc.start(await this.room.getInvite())
+    await this.debounceMessages()
   }
 
-  async _getMessages () {
+  async _messages () {
     const messages = await this.room.getMessages()
     messages.sort((a, b) => a.info.at - b.info.at)
-    this._write('messages', messages)
-  }
-
-  _write (tag, data) {
-    this.pipe.write(Buffer.from(JSON.stringify({ tag, data }) + '\n'))
+    this.rpc.messages(messages)
   }
 }
