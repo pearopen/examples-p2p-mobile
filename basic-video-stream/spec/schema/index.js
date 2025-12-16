@@ -11,8 +11,33 @@ const VERSION = 1
 // eslint-disable-next-line no-unused-vars
 let version = VERSION
 
-// @basic-video-stream/writers
+// @basic-video-stream/log
 const encoding0 = {
+  preencode(state, m) {
+    c.string.preencode(state, m.level)
+    c.string.preencode(state, m.message)
+    c.int.preencode(state, m.at)
+  },
+  encode(state, m) {
+    c.string.encode(state, m.level)
+    c.string.encode(state, m.message)
+    c.int.encode(state, m.at)
+  },
+  decode(state) {
+    const r0 = c.string.decode(state)
+    const r1 = c.string.decode(state)
+    const r2 = c.int.decode(state)
+
+    return {
+      level: r0,
+      message: r1,
+      at: r2
+    }
+  }
+}
+
+// @basic-video-stream/writer
+const encoding1 = {
   preencode(state, m) {
     c.buffer.preencode(state, m.key)
   },
@@ -28,8 +53,8 @@ const encoding0 = {
   }
 }
 
-// @basic-video-stream/invites
-const encoding1 = {
+// @basic-video-stream/invite
+const encoding2 = {
   preencode(state, m) {
     c.buffer.preencode(state, m.id)
     c.buffer.preencode(state, m.invite)
@@ -57,38 +82,7 @@ const encoding1 = {
   }
 }
 
-// @basic-video-stream/messages
-const encoding2 = {
-  preencode(state, m) {
-    c.string.preencode(state, m.id)
-    c.string.preencode(state, m.text)
-    state.end++ // max flag is 1 so always one byte
-
-    if (m.info) c.json.preencode(state, m.info)
-  },
-  encode(state, m) {
-    const flags = m.info ? 1 : 0
-
-    c.string.encode(state, m.id)
-    c.string.encode(state, m.text)
-    c.uint.encode(state, flags)
-
-    if (m.info) c.json.encode(state, m.info)
-  },
-  decode(state) {
-    const r0 = c.string.decode(state)
-    const r1 = c.string.decode(state)
-    const flags = c.uint.decode(state)
-
-    return {
-      id: r0,
-      text: r1,
-      info: (flags & 1) !== 0 ? c.json.decode(state) : null
-    }
-  }
-}
-
-// @basic-video-stream/videos
+// @basic-video-stream/video
 const encoding3 = {
   preencode(state, m) {
     c.string.preencode(state, m.id)
@@ -127,6 +121,91 @@ const encoding3 = {
   }
 }
 
+// @basic-video-stream/videos
+const encoding4 = c.array(c.frame(encoding3))
+
+// @basic-video-stream/add-video
+const encoding5 = {
+  preencode(state, m) {
+    c.string.preencode(state, m.name)
+    c.string.preencode(state, m.uri)
+  },
+  encode(state, m) {
+    c.string.encode(state, m.name)
+    c.string.encode(state, m.uri)
+  },
+  decode(state) {
+    const r0 = c.string.decode(state)
+    const r1 = c.string.decode(state)
+
+    return {
+      name: r0,
+      uri: r1
+    }
+  }
+}
+
+// @basic-video-stream/message
+const encoding6 = {
+  preencode(state, m) {
+    c.string.preencode(state, m.id)
+    c.string.preencode(state, m.text)
+    state.end++ // max flag is 1 so always one byte
+
+    if (m.info) c.json.preencode(state, m.info)
+  },
+  encode(state, m) {
+    const flags = m.info ? 1 : 0
+
+    c.string.encode(state, m.id)
+    c.string.encode(state, m.text)
+    c.uint.encode(state, flags)
+
+    if (m.info) c.json.encode(state, m.info)
+  },
+  decode(state) {
+    const r0 = c.string.decode(state)
+    const r1 = c.string.decode(state)
+    const flags = c.uint.decode(state)
+
+    return {
+      id: r0,
+      text: r1,
+      info: (flags & 1) !== 0 ? c.json.decode(state) : null
+    }
+  }
+}
+
+// @basic-video-stream/messages
+const encoding7 = c.array(c.frame(encoding6))
+
+// @basic-video-stream/add-message
+const encoding8 = {
+  preencode(state, m) {
+    c.string.preencode(state, m.text)
+    state.end++ // max flag is 1 so always one byte
+
+    if (m.info) c.json.preencode(state, m.info)
+  },
+  encode(state, m) {
+    const flags = m.info ? 1 : 0
+
+    c.string.encode(state, m.text)
+    c.uint.encode(state, flags)
+
+    if (m.info) c.json.encode(state, m.info)
+  },
+  decode(state) {
+    const r0 = c.string.decode(state)
+    const flags = c.uint.decode(state)
+
+    return {
+      text: r0,
+      info: (flags & 1) !== 0 ? c.json.decode(state) : null
+    }
+  }
+}
+
 function setVersion(v) {
   version = v
 }
@@ -150,14 +229,24 @@ function getEnum(name) {
 
 function getEncoding(name) {
   switch (name) {
-    case '@basic-video-stream/writers':
+    case '@basic-video-stream/log':
       return encoding0
-    case '@basic-video-stream/invites':
+    case '@basic-video-stream/writer':
       return encoding1
-    case '@basic-video-stream/messages':
+    case '@basic-video-stream/invite':
       return encoding2
-    case '@basic-video-stream/videos':
+    case '@basic-video-stream/video':
       return encoding3
+    case '@basic-video-stream/videos':
+      return encoding4
+    case '@basic-video-stream/add-video':
+      return encoding5
+    case '@basic-video-stream/message':
+      return encoding6
+    case '@basic-video-stream/messages':
+      return encoding7
+    case '@basic-video-stream/add-message':
+      return encoding8
     default:
       throw new Error('Encoder not found ' + name)
   }

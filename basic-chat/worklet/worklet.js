@@ -1,7 +1,7 @@
 import Corestore from 'corestore'
 import debounce from 'debounceify'
-import Hyperswarm from 'hyperswarm'
 import FramedStream from 'framed-stream'
+import Hyperswarm from 'hyperswarm'
 import ReadyResource from 'ready-resource'
 
 import ChatRoom from './chat-room'

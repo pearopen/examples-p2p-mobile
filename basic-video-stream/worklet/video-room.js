@@ -13,7 +13,7 @@ import z32 from 'z32'
 import * as BasicVideoStreamDispatch from '../spec/dispatch'
 import BasicVideoStreamDb from '../spec/db'
 
-export default class VideoStreamRoom extends ReadyResource {
+export default class VideoRoom extends ReadyResource {
   constructor (store, swarm) {
     super()
 
@@ -186,17 +186,17 @@ export default class VideoStreamRoom extends ReadyResource {
     }
     return videos.map(item => {
       const link = this.blobServer.getLink(item.blob.key, { blob: item.blob, type: item.type })
-      return { ...item, link }
+      return { ...item, info: { ...item.info, link } }
     })
   }
 
-  async addVideo ({ name, path: filePath }, info) {
+  async addVideo ({ name, uri }, info) {
     const type = getMimeType(name)
     if (!type || !type.startsWith('video/')) {
       throw new Error('Only video files are allowed')
     }
 
-    const rs = fs.createReadStream(filePath)
+    const rs = fs.createReadStream(uri)
     const ws = this.blobs.createWriteStream()
     await new Promise((resolve, reject) => {
       ws.on('error', reject)

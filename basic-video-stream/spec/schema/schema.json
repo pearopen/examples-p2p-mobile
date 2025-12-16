@@ -2,7 +2,33 @@
   "version": 1,
   "schema": [
     {
-      "name": "writers",
+      "name": "log",
+      "namespace": "basic-video-stream",
+      "compact": false,
+      "flagsPosition": -1,
+      "fields": [
+        {
+          "name": "level",
+          "required": true,
+          "type": "string",
+          "version": 1
+        },
+        {
+          "name": "message",
+          "required": true,
+          "type": "string",
+          "version": 1
+        },
+        {
+          "name": "at",
+          "required": true,
+          "type": "int",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "name": "writer",
       "namespace": "basic-video-stream",
       "compact": false,
       "flagsPosition": -1,
@@ -16,7 +42,7 @@
       ]
     },
     {
-      "name": "invites",
+      "name": "invite",
       "namespace": "basic-video-stream",
       "compact": false,
       "flagsPosition": -1,
@@ -48,32 +74,7 @@
       ]
     },
     {
-      "name": "messages",
-      "namespace": "basic-video-stream",
-      "compact": false,
-      "flagsPosition": 2,
-      "fields": [
-        {
-          "name": "id",
-          "required": true,
-          "type": "string",
-          "version": 1
-        },
-        {
-          "name": "text",
-          "required": true,
-          "type": "string",
-          "version": 1
-        },
-        {
-          "name": "info",
-          "type": "json",
-          "version": 1
-        }
-      ]
-    },
-    {
-      "name": "videos",
+      "name": "video",
       "namespace": "basic-video-stream",
       "compact": false,
       "flagsPosition": 4,
@@ -100,6 +101,82 @@
           "name": "blob",
           "required": true,
           "type": "json",
+          "version": 1
+        },
+        {
+          "name": "info",
+          "type": "json",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "name": "videos",
+      "namespace": "basic-video-stream",
+      "array": true,
+      "type": "@basic-video-stream/video"
+    },
+    {
+      "name": "add-video",
+      "namespace": "basic-video-stream",
+      "compact": false,
+      "flagsPosition": -1,
+      "fields": [
+        {
+          "name": "name",
+          "required": true,
+          "type": "string",
+          "version": 1
+        },
+        {
+          "name": "uri",
+          "required": true,
+          "type": "string",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "name": "message",
+      "namespace": "basic-video-stream",
+      "compact": false,
+      "flagsPosition": 2,
+      "fields": [
+        {
+          "name": "id",
+          "required": true,
+          "type": "string",
+          "version": 1
+        },
+        {
+          "name": "text",
+          "required": true,
+          "type": "string",
+          "version": 1
+        },
+        {
+          "name": "info",
+          "type": "json",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "name": "messages",
+      "namespace": "basic-video-stream",
+      "array": true,
+      "type": "@basic-video-stream/message"
+    },
+    {
+      "name": "add-message",
+      "namespace": "basic-video-stream",
+      "compact": false,
+      "flagsPosition": 1,
+      "fields": [
+        {
+          "name": "text",
+          "required": true,
+          "type": "string",
           "version": 1
         },
         {

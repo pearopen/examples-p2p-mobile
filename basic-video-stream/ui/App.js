@@ -8,7 +8,7 @@ import { getDocumentAsync } from 'expo-document-picker'
 import useWorklet from './use-workket'
 
 export default function App () {
-  const { invite, messages, videos, error, start, addMessage, addVideo, reset, clearError } = useWorklet()
+  const { error, invite, videos, messages, clearError, reset, start, addVideo, addMessage } = useWorklet()
 
   const [mode, setMode] = useState('create')
   const [joinInvite, setJoinInvite] = useState('')
@@ -26,7 +26,7 @@ export default function App () {
       alert('Please provide invite to join room')
       return
     }
-    start(mode === 'join' ? joinInvite : undefined)
+    start(mode === 'join' ? joinInvite : '')
   }
 
   const onReset = () => {
@@ -37,7 +37,7 @@ export default function App () {
     try {
       const result = await getDocumentAsync({ type: 'video/*' })
       for (const asset of result.assets) {
-        addVideo({ name: asset.name, path: asset.uri.substring('file://'.length) })
+        addVideo({ name: asset.name, uri: asset.uri.substring('file://'.length) })
       }
     } catch (err) {
       alert('Failed to pick a file')
@@ -116,7 +116,7 @@ export default function App () {
               {playerId === video.id && (
                 <View style={styles.playerSection}>
                   <Video
-                    source={{ uri: video.link }}
+                    source={{ uri: video.info.link }}
                     style={styles.videoPlayer}
                     useNativeControls
                     resizeMode='contain'
@@ -150,7 +150,6 @@ export default function App () {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View style={styles.container}>
-        {!invite ? renderSetupRoom() : renderVideos()}
         {error && (
           <>
             <Text style={styles.title}>{error}</Text>
@@ -159,6 +158,7 @@ export default function App () {
             </TouchableOpacity>
           </>
         )}
+        {!invite ? renderSetupRoom() : renderVideos()}
       </View>
     </TouchableWithoutFeedback>
   )
@@ -227,7 +227,8 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 12,
     backgroundColor: 'red',
-    marginLeft: 8
+    marginTop: 12,
+    marginBottom: 12
   },
   resetText: {
     color: '#fff',
