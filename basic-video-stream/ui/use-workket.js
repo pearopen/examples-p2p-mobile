@@ -45,6 +45,7 @@ export default function useWorklet () {
     clearError: () => setError(''),
     reset: () => {
       rpc.reset()
+      setInvite('')
       setVideos([])
       setMessages([])
     },
