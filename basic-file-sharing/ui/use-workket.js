@@ -42,7 +42,6 @@ export default function useWorklet () {
     clearError: () => setError(''),
     reset: () => {
       rpc.reset()
-      setInvite('')
       setDrives([])
     },
     start: (invite) => rpc.start(invite),

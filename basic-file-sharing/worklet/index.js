@@ -1,16 +1,31 @@
 /* eslint-disable no-undef */
 
+import FramedStream from 'framed-stream'
 import fs from 'fs'
 
-import Worklet from './worklet'
+import HRPC from '../spec/hrpc'
+import WorkletTask from './worklet-task'
 
 const { IPC: pipe } = BareKit
 const storage = Bare.argv[0]
 const name = Bare.argv[1]
 
-const worklet = new Worklet(pipe, storage, name)
-worklet.on('reset', async () => {
-  await worklet.close()
+const stream = new FramedStream(pipe)
+const rpc = new HRPC(stream)
+stream.pause()
+
+let workletTask = new WorkletTask(rpc, storage, name)
+rpc.onReset(async () => {
+  stream.pause()
+  await workletTask.close()
   await fs.promises.rm(storage, { recursive: true, force: true })
+  workletTask = new WorkletTask(rpc, storage, name)
+  await workletTask.ready()
+  stream.resume()
 })
-await worklet.ready()
+rpc.onStart(async (data) => {
+  workletTask.room.invite = data
+  await workletTask.start()
+})
+await workletTask.ready()
+stream.resume()

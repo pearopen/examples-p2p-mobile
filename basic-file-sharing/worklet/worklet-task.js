@@ -1,5 +1,4 @@
 import Corestore from 'corestore'
-import FramedStream from 'framed-stream'
 import fs from 'fs'
 import idEnc from 'hypercore-id-encoding'
 import Hyperswarm from 'hyperswarm'
@@ -7,17 +6,12 @@ import path from 'path'
 import ReadyResource from 'ready-resource'
 
 import DriveRoom from './drive-room'
-import HRPC from '../spec/hrpc'
 
-export default class Worklet extends ReadyResource {
-  constructor (pipe, storage, name) {
+export default class WorkletTask extends ReadyResource {
+  constructor (rpc, storage, name) {
     super()
 
-    this.pipe = pipe
-    this.stream = new FramedStream(pipe)
-    this.rpc = new HRPC(this.stream)
-    this.stream.pause()
-
+    this.rpc = rpc
     this.storage = storage
     this.name = name || `User ${Date.now()}`
 
@@ -46,21 +40,15 @@ export default class Worklet extends ReadyResource {
     this.rpc.log({ level: 'info', message: `My drive: ${this.myDrivePath}`, at: Date.now() })
     this.rpc.log({ level: 'info', message: `Shared drives: ${this.sharedDrivesPath}`, at: Date.now() })
 
-    this.rpc.onReset(() => this.emit('reset'))
-    this.rpc.onStart(async (data) => {
-      this.room.invite = data
-      await this._start()
-    })
     this.rpc.onAddFile(async (data) => {
       await fs.promises.copyFile(data.uri, path.join(this.myDrivePath, data.name))
     })
-    this.stream.resume()
 
     await this.room.localBase.ready()
     if (this.room.localBase.length === 0) {
       this.rpc.start('')
     } else {
-      await this._start()
+      await this.start()
     }
   }
 
@@ -71,7 +59,7 @@ export default class Worklet extends ReadyResource {
     await this.store.close()
   }
 
-  async _start () {
+  async start () {
     await this.room.ready()
     this.rpc.start(await this.room.getInvite())
 
@@ -103,9 +91,5 @@ export default class Worklet extends ReadyResource {
       })
       this.rpc.drives(drives)
     }, 1000)
-  }
-
-  _write (tag, data) {
-    this.pipe.write(Buffer.from(JSON.stringify({ tag, data }) + '\n'))
   }
 }
