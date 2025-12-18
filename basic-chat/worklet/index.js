@@ -2,6 +2,7 @@
 
 import FramedStream from 'framed-stream'
 import fs from 'fs'
+import goodbye from 'graceful-goodbye'
 
 import HRPC from '../spec/hrpc'
 import WorkletTask from './worklet-task'
@@ -15,6 +16,7 @@ const rpc = new HRPC(stream)
 stream.pause()
 
 let workletTask = new WorkletTask(rpc, storage, name)
+goodbye(() => workletTask.close())
 rpc.onReset(async () => {
   stream.pause()
   await workletTask.close()
