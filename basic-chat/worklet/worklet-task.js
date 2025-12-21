@@ -9,6 +9,7 @@ export default class WorkletTask extends ReadyResource {
   constructor (rpc, storage, name) {
     super()
 
+    /** @type {InstanceType<typeof import('../spec/hrpc').default>} */
     this.rpc = rpc
     this.storage = storage
     this.name = name || `User ${Date.now()}`
