@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "schema": [
+    {
+      "id": 0,
+      "name": "@basic-chat-blind-peering/log",
+      "request": {
+        "name": "@basic-chat-blind-peering/log",
+        "send": true
+      },
+      "version": 1
+    },
+    {
+      "id": 1,
+      "name": "@basic-chat-blind-peering/reset",
+      "request": {
+        "name": "bool",
+        "send": true
+      },
+      "version": 1
+    },
+    {
+      "id": 2,
+      "name": "@basic-chat-blind-peering/start",
+      "request": {
+        "name": "string",
+        "send": true
+      },
+      "version": 1
+    },
+    {
+      "id": 3,
+      "name": "@basic-chat-blind-peering/messages",
+      "request": {
+        "name": "@basic-chat-blind-peering/messages",
+        "send": true
+      },
+      "version": 1
+    },
+    {
+      "id": 4,
+      "name": "@basic-chat-blind-peering/add-message",
+      "request": {
+        "name": "string",
+        "send": true
+      },
+      "version": 1
+    },
+    {
+      "id": 5,
+      "name": "@basic-chat-blind-peering/add-blind-peer",
+      "request": {
+        "name": "string",
+        "send": true
+      },
+      "version": 1
+    }
+  ]
+}

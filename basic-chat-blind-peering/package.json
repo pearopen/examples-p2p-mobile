@@ -1,0 +1,53 @@
+{
+  "name": "basic-chat-blind-peering",
+  "version": "0.0.1",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "clean": "ROOT=$(git rev-parse --show-toplevel); watchman watch-del $ROOT; watchman watch-project $ROOT",
+    "build:db": "node schema.js",
+    "build": "bare-pack --target android-arm64 --target ios-arm64 --linked --out worklet/app.bundle.mjs worklet/index.js",
+    "start": "expo start -d",
+    "ios": "expo run:ios",
+    "android": "expo run:android"
+  },
+  "dependencies": {
+    "autobase": "^7.24.0",
+    "b4a": "^1.7.3",
+    "bare-fs": "^4.5.2",
+    "blind-pairing": "^2.3.1",
+    "blind-peering": "^1.15.0",
+    "corestore": "^7.7.0",
+    "debounceify": "^1.1.0",
+    "events": "^3.3.0",
+    "expo": "^54.0.27",
+    "expo-build-properties": "^1.0.10",
+    "expo-clipboard": "~8.0.8",
+    "framed-stream": "^1.0.1",
+    "graceful-goodbye": "^1.3.3",
+    "hrpc": "^4.3.0",
+    "hyperbee": "^2.26.5",
+    "hyperdb": "^4.22.3",
+    "hyperdispatch": "^1.4.4",
+    "hyperschema": "^1.17.1",
+    "hyperswarm": "^4.16.0",
+    "react": "19.1.0",
+    "react-native": "~0.81.5",
+    "react-native-b4a": "^0.0.4",
+    "react-native-bare-kit": "^0.11.5",
+    "ready-resource": "^1.2.0",
+    "z32": "^1.1.0"
+  },
+  "devDependencies": {
+    "@types/b4a": "^1.6.5",
+    "@types/react": "~19.1.10",
+    "@types/streamx": "^2.9.5",
+    "bare-pack": "^1.5.1"
+  },
+  "imports": {
+    "fs": {
+      "bare": "bare-fs",
+      "default": "fs"
+    }
+  }
+}
