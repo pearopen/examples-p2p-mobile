@@ -8,13 +8,13 @@ import VideoRoom from './video-room'
 import HRPC from '../spec/hrpc'
 
 export default class WorkletTask extends ReadyResource {
-  constructor (rpc, storage, name) {
+  constructor (rpc, storage, opts = {}) {
     super()
 
     /** @type {InstanceType<typeof import('../spec/hrpc').default>} */
     this.rpc = rpc
     this.storage = storage
-    this.name = name || `User ${Date.now()}`
+    this.name = opts.name || `User ${Date.now()}`
 
     this.store = new Corestore(storage)
     this.swarm = new Hyperswarm()
