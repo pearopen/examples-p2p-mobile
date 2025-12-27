@@ -1,11 +1,9 @@
 import Corestore from 'corestore'
 import debounce from 'debounceify'
-import FramedStream from 'framed-stream'
 import Hyperswarm from 'hyperswarm'
 import ReadyResource from 'ready-resource'
 
 import VideoRoom from './video-room'
-import HRPC from '../spec/hrpc'
 
 export default class WorkletTask extends ReadyResource {
   constructor (rpc, storage, opts = {}) {
